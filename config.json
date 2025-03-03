@@ -1,0 +1,46 @@
+{
+    "twitch": {
+        "channel": "YourTwitchChannelNameHere",
+        "botName": "YourBotAccountNameHere", 
+        "oauthToken": "oauth:your_oauth_token_here"
+    },
+    "vtubeStudio": {
+        "host": "localhost",
+        "port": 8001
+    },
+    "intervals": {
+        "minSeconds": 300,
+        "maxSeconds": 600
+    },
+    "filters": {
+        "bannedWords": ["slur1", "slur2", "someotherbadword"]
+    },
+    "topics": [
+        "What's your favorite game?",
+        "Tell us a funny story about your past streams.",
+        "What do you think about pineapple on pizza?",
+        "Any weird dreams lately?",
+        "What's your hot take on AI VTubers?"
+    ],
+    "moods": {
+        "happy": ["fun", "joke", "celebrate"],
+        "serious": ["dark", "serious", "deep topic"],
+        "neutral": []
+    },
+    "expressions": {
+        "happy": "expressionSmile",
+        "serious": "expressionSad",
+        "neutral": "expressionNeutral"
+    },
+    "chatHandling": {
+        "maxRecentMessages": 20,
+        "priorityKeywords": ["question", "important", "urgent"]
+    },
+    "cooldowns": {
+        "topicCooldownMinutes": 10
+    },
+    "moderation": {
+        "autoModerate": true,
+        "deleteFilteredMessages": true
+    }
+}
