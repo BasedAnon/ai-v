@@ -1,9 +1,8 @@
 {
     "name": "AI VTuber Plugin",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "AI VTuber that generates dialogue, reacts to Twitch chat, and controls VTube Studio expressions.",
-    "author": "Vestra Locke's Evil Twin",
-    "entry": "index.js",
-    "requires": ["tavern"],
-    "optional": ["state"]
+    "author": "Vestra Locke",
+    "entry": "worker.js",
+    "sandboxed": true
 }
