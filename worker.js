@@ -41,7 +41,11 @@ let config = {
 let cooldowns = new Set();
 let twitchMessages = [];
 let currentMood = "neutral";
-let vtubeStudio;
+let vtubeStudio = null;
+
+function log(msg) {
+    postMessage({ type: "log", content: `[AI VTuber Plugin] ${msg}` });
+}
 
 function loadConfig() {
     postMessage({ type: "readFile", file: "config.json" });
@@ -72,7 +76,9 @@ function postAIMessage(prompt) {
 }
 
 function setExpression(mood) {
+    if (!vtubeStudio || vtubeStudio.readyState !== WebSocket.OPEN) return;
     const expression = config.expressions[mood] || config.expressions.neutral;
+
     vtubeStudio.send(JSON.stringify({
         apiName: "VTubeStudioPublicAPI",
         apiVersion: "1.0",
@@ -113,10 +119,20 @@ function setMoodBasedOnTopic(topic) {
 }
 
 function handleIncomingMessage(event) {
-    const { type, content } = event.data;
+    const { type, file, content } = event.data;
 
-    if (type === "readFileResult" && content) {
-        config = JSON.parse(content);
+    if (type === "readFileResult" && file === "config.json") {
+        if (content) {
+            try {
+                config = JSON.parse(content);
+            } catch (err) {
+                log(`Failed to parse config.json: ${err.message}`);
+            }
+        } else {
+            log("No config.json found, generating default.");
+            saveConfig();
+        }
+
         setupVTubeStudioConnection();
         scheduleNextMonologue();
     }
@@ -140,9 +156,14 @@ function passesFilter(message) {
 }
 
 function setupVTubeStudioConnection() {
+    if (vtubeStudio) {
+        vtubeStudio.close();
+    }
+
     vtubeStudio = new WebSocket(`ws://${config.vtubeStudio.host}:${config.vtubeStudio.port}`);
+
     vtubeStudio.onopen = () => {
-        postSystemMessage("Connected to VTube Studio.");
+        log("Connected to VTube Studio.");
         vtubeStudio.send(JSON.stringify({
             apiName: "VTubeStudioPublicAPI",
             apiVersion: "1.0",
@@ -154,13 +175,20 @@ function setupVTubeStudioConnection() {
             }
         }));
     };
+
     vtubeStudio.onerror = (err) => {
-        postSystemMessage(`VTube Studio connection error: ${err.message}`);
+        log(`VTube Studio connection error: ${err.message}`);
+    };
+
+    vtubeStudio.onclose = () => {
+        log("VTube Studio connection closed. Reconnecting in 30 seconds...");
+        setTimeout(setupVTubeStudioConnection, 30000);
     };
 }
 
-// Listen for all SillyTavern extension events
-onmessage = handleIncomingMessage;
-
-// Start by loading the config
+// === Initial Startup ===
+log("AI VTuber Plugin loading...");
 loadConfig();
+
+// Listen for SillyTavern extension messages
+onmessage = handleIncomingMessage;
