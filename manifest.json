@@ -1,8 +1,9 @@
 {
     "name": "AI VTuber Plugin",
     "version": "2.0.0",
-    "description": "AI VTuber that generates dialogue, reacts to Twitch chat, and controls VTube Studio expressions.",
+    "description": "AI VTuber that reacts to chat and controls VTube Studio.",
     "author": "Vestra Locke",
     "entry": "worker.js",
-    "sandboxed": true
+    "sandboxed": true,
+    "type": "service"
 }
